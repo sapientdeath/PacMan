@@ -1,0 +1,171 @@
+public class Ghost{
+	int ghost_r;
+	int ghost_c;
+	int direction;
+	int grid[][];
+	final int UP = 0;
+	final int RIGHT = 3;
+	final int DOWN = 1;
+	final int LEFT = 2;
+	int lastSpot = PacMan.EMPTY;
+	int moves[];
+	int moves_step;
+
+	public Ghost(int r, int c, int dir,int g[][], int m[]){
+		ghost_r = r;
+		ghost_c = c;
+		grid = g;
+		direction = dir;
+		moves = m;
+		moves_step = 0;
+
+	}
+	/*public int czechpacman(int p_r, int p_c){
+		if (direction ==  UP) {
+			if(PacMan.pacman_r == ghost_r){
+				if (PacMan.pacman_c > ghost_c) direction = RIGHT;
+				else direction= LEFT;
+			}
+
+		}
+		else if (direction == DOWN){
+
+		}
+		else if (direction == LEFT){
+
+		} 
+		else if (direction == RIGHT){
+
+		}
+	}
+	*/
+	public void flip(){
+		if (direction == UP) direction = DOWN;
+		else if (direction == DOWN) direction = UP;
+		else if (direction == LEFT) direction = RIGHT;
+		else if (direction == RIGHT) direction = LEFT;
+	}
+	public boolean move(){
+		if(moves_step!=moves.length){
+			direction = moves[moves_step];
+			moves_step++;
+		}
+		if(direction==UP){
+		if (grid[ghost_r-1][ghost_c]==PacMan.EMPTY || grid[ghost_r-1][ghost_c]==PacMan.PELLET || grid[ghost_r-1][ghost_c]==PacMan.MUSHROOM){
+			if(lastSpot == PacMan.EMPTY){
+			lastSpot = grid[ghost_r-1][ghost_c];
+			grid[ghost_r-1][ghost_c]= PacMan.GOOMBA;
+			grid[ghost_r][ghost_c]=PacMan.EMPTY;
+			ghost_r--;
+			}
+			if(lastSpot == PacMan.PELLET){
+			lastSpot = grid[ghost_r-1][ghost_c];
+			grid[ghost_r-1][ghost_c]= PacMan.GOOMBA;
+			grid[ghost_r][ghost_c]=PacMan.PELLET;
+			ghost_r--;
+			}
+			if(lastSpot == PacMan.MUSHROOM){
+			lastSpot = grid[ghost_r-1][ghost_c];
+			grid[ghost_r-1][ghost_c]= PacMan.GOOMBA;
+			grid[ghost_r][ghost_c]=PacMan.MUSHROOM;
+			ghost_r--;
+			}
+
+		}
+		else if(grid[ghost_r-1][ghost_c]==PacMan.MARIO) {
+			return true;
+		}
+		else if(grid[ghost_r-1][ghost_c]==PacMan.WALL) {
+			System.out.println("up");
+			this.flip();
+		}
+	}
+		else if(direction==DOWN){
+		if(grid[ghost_r+1][ghost_c]==PacMan.EMPTY || grid[ghost_r+1][ghost_c]==PacMan.PELLET || grid[ghost_r+1][ghost_c]==PacMan.MUSHROOM){
+			if(lastSpot == PacMan.EMPTY){
+			lastSpot = grid[ghost_r+1][ghost_c];
+			grid[ghost_r+1][ghost_c]= PacMan.GOOMBA;
+			grid[ghost_r][ghost_c]=PacMan.EMPTY;
+			ghost_r++;
+			}
+			if(lastSpot == PacMan.PELLET){
+			lastSpot = grid[ghost_r+1][ghost_c];
+			grid[ghost_r+1][ghost_c]= PacMan.GOOMBA;
+			grid[ghost_r][ghost_c]=PacMan.PELLET;
+			ghost_r++;
+			}
+			if(lastSpot == PacMan.MUSHROOM){
+			lastSpot = grid[ghost_r+1][ghost_c];
+			grid[ghost_r+1][ghost_c]= PacMan.GOOMBA;
+			grid[ghost_r][ghost_c]=PacMan.MUSHROOM;
+			ghost_r++;
+			}
+
+		}
+		else if(grid[ghost_r+1][ghost_c]==PacMan.MARIO) {
+			return true;
+		}
+		else if(grid[ghost_r+1][ghost_c]==PacMan.WALL) {
+			this.flip();
+		}
+		}
+		else if(direction==LEFT){
+		if( grid[ghost_r][ghost_c-1] ==PacMan.EMPTY || grid[ghost_r][ghost_c-1]==PacMan.PELLET || grid[ghost_r][ghost_c-1]==PacMan.MUSHROOM){
+			if(lastSpot == PacMan.EMPTY){
+			lastSpot = grid[ghost_r][ghost_c-1];
+			grid[ghost_r][ghost_c-1]= PacMan.GOOMBA;
+			grid[ghost_r][ghost_c]=PacMan.EMPTY;
+			ghost_c--;
+			}
+			if(lastSpot == PacMan.PELLET){
+			lastSpot = grid[ghost_r][ghost_c-1];
+			grid[ghost_r][ghost_c-1]= PacMan.GOOMBA;
+			grid[ghost_r][ghost_c]=PacMan.PELLET;
+			ghost_c--;
+			}
+			if(lastSpot == PacMan.MUSHROOM){
+			lastSpot = grid[ghost_r][ghost_c-1];
+			grid[ghost_r][ghost_c-1]= PacMan.GOOMBA;
+			grid[ghost_r][ghost_c]=PacMan.MUSHROOM;
+			ghost_c--;
+			}
+		}
+		else if(grid[ghost_r][ghost_c-1]==PacMan.MARIO) {
+			return true;
+		}
+		else if(grid[ghost_r][ghost_c-1]==PacMan.WALL) {
+			this.flip();
+		}
+		}
+		else if(direction==RIGHT){
+		if(grid[ghost_r][ghost_c+1] ==PacMan.EMPTY || grid[ghost_r][ghost_c+1]==PacMan.PELLET || grid[ghost_r][ghost_c+1]==PacMan.MUSHROOM){
+			if(lastSpot == PacMan.EMPTY){
+			lastSpot = grid[ghost_r][ghost_c+1];
+			grid[ghost_r][ghost_c+1]= PacMan.GOOMBA;
+			grid[ghost_r][ghost_c]=PacMan.EMPTY;
+			ghost_c++;
+			}
+			if(lastSpot == PacMan.PELLET){
+			lastSpot = grid[ghost_r][ghost_c+1];
+			grid[ghost_r][ghost_c+1]= PacMan.GOOMBA;
+			grid[ghost_r][ghost_c]=PacMan.PELLET;
+			ghost_c++;
+			}
+			if(lastSpot == PacMan.MUSHROOM){
+			lastSpot = grid[ghost_r][ghost_c+1];
+			grid[ghost_r][ghost_c+1]= PacMan.GOOMBA;
+			grid[ghost_r][ghost_c]=PacMan.MUSHROOM;
+			ghost_c++;
+			}
+		}
+		else if(grid[ghost_r][ghost_c+1] ==PacMan.MARIO){
+			return true;
+		}
+		else if(grid[ghost_r][ghost_c+1] ==PacMan.WALL){
+			this.flip();
+		}
+		}
+		return false;
+		}
+
+}

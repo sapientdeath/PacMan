@@ -1,0 +1,282 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.net.URL;
+import javax.sound.sampled.*;
+
+public class PacMan implements KeyListener, ActionListener{
+	ImageIcon empty = new ImageIcon("ground.jpg");
+	int direction = 1;
+	final int UP = 0;
+	final int RIGHT = 1;
+	final int DOWN = 2;
+	final int LEFT = 3;
+	ImageIcon pacmans[]={
+	new ImageIcon("Ottomarioup.gif"),
+	new ImageIcon("Ottomario.gif"),
+	new ImageIcon("Ottomariodown.gif"),
+	new ImageIcon("Ottomarioleft.gif"),
+	};
+	ImageIcon blocks[]={
+	new ImageIcon("groundcoin.jpg"),
+		new ImageIcon("Ottomarioup.gif"),
+	new ImageIcon("groundgoomba.jpg"),
+	new ImageIcon("ground.jpg"),
+	new ImageIcon("irrompible.gif"),
+	new ImageIcon("groundmushroom.jpg")
+};
+	int life = 3;
+	JFrame window;
+	JLabel block;
+	int score = 0;
+	final static int MARIO=1;
+	final static int EMPTY = 3;
+	final static int WALL= 4;
+	final static int GOOMBA = 2;
+	final static int PELLET = 0;
+	final static int MUSHROOM = 5;
+	//16 row 32 column
+int grid[][] = { 
+			/*   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5  */
+				{4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4},//0
+				{4,0,0,4,4,0,0,0,0,0,0,4,4,0,0,4},//1
+				{4,0,0,4,4,0,4,4,4,4,0,4,4,0,0,4},//2
+				{4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},//3
+				{4,0,4,4,4,4,0,4,4,0,4,4,4,4,0,4},//4
+				{4,0,4,4,4,4,0,4,4,0,4,4,4,4,0,4},//5
+				{4,5,0,0,0,0,0,4,4,0,0,0,0,0,5,4},//6
+				{4,4,4,4,0,4,4,4,4,4,4,0,4,4,4,4},//7
+				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},//8
+				{4,4,4,0,4,4,4,0,0,4,4,4,0,4,4,4},//9
+				{3,3,4,0,4,0,0,2,2,0,0,4,0,4,3,3},//10
+				{3,3,4,0,4,0,0,2,2,0,0,4,0,4,3,3},//11
+				{3,3,4,0,4,0,0,0,0,0,0,4,0,4,3,3},//12
+				{4,4,4,0,4,4,4,4,4,4,4,4,0,4,4,4},//13
+				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},//14
+				{4,4,4,0,4,0,4,4,4,4,0,4,0,4,4,4},//15
+				{3,3,4,0,4,0,0,0,0,0,0,4,0,4,3,3},//16
+				{4,4,4,0,4,4,0,4,4,0,4,4,0,4,4,4},//17
+				{4,0,0,0,0,0,0,4,4,0,0,0,0,0,0,4},//18
+				{4,0,4,4,4,4,4,4,4,4,4,4,4,4,0,4},//19
+				{4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},//20
+				{4,0,4,4,0,4,4,4,4,4,4,0,4,4,0,4},//21
+				{4,0,4,4,0,0,0,0,1,0,0,0,4,4,0,4},//22
+				{4,0,4,4,4,0,4,4,4,4,0,4,4,4,0,4},//23
+				{4,5,0,0,0,0,4,4,4,4,0,0,0,0,0,4},//24
+				{4,0,4,4,4,0,4,4,4,4,0,4,4,4,0,4},//25
+				{4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},//26
+				{4,0,4,4,0,4,4,0,0,4,4,0,4,4,0,4},//27
+				{4,0,4,4,0,4,0,0,0,0,4,0,4,4,0,4},//28
+				{4,0,4,4,0,4,0,4,4,0,4,0,4,4,0,4},//29
+				{4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},//30
+				{4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4},//31
+				};
+JLabel pGrid[][];
+int inky_m[]={UP, UP, RIGHT, RIGHT, RIGHT, RIGHT, DOWN};
+int pinky_m[]={UP, UP, LEFT, LEFT, LEFT, LEFT, DOWN};
+Ghost pinky= new Ghost(10,7,UP,grid,pinky_m);
+Ghost inky = new Ghost(10,8,UP,grid,inky_m);
+Ghost blinky;
+Ghost clyde;
+Timer time;
+public int pacman_r=getPacManRow();
+public int pacman_c=getPacManCol();
+
+public void actionPerformed(ActionEvent e){
+	if(inky.move()){
+		death();
+	}
+	if(pinky.move()){
+		death();
+	}
+	paintGrid();
+}
+
+
+public void keyTyped(KeyEvent e){
+		
+		
+	}
+	public void keyPressed(KeyEvent e){
+		SoundEffect.WAKA.play();
+		System.out.println(e.getKeyCode());
+		int value=e.getKeyCode();
+	
+
+		if(value==38){
+			direction = UP;
+			int pacman_r=getPacManRow();
+			int pacman_c=getPacManCol();
+			if(grid[pacman_r-1][pacman_c]==EMPTY || grid[pacman_r-1][pacman_c]==PELLET || grid[pacman_r-1][pacman_c]==MARIO){
+			if(grid[pacman_r-1][pacman_c]==PELLET)score++;
+			if(grid[pacman_r-1][pacman_c]==MUSHROOM)score+=10;
+			grid[pacman_r-1][pacman_c]=MARIO;
+			grid[pacman_r][pacman_c]=EMPTY;
+		}
+		else if(grid[pacman_r-1][pacman_c]==GOOMBA){
+		death();
+		}
+		}
+		else if (value==40){
+			direction = DOWN;
+			int pacman_r=getPacManRow();
+			int pacman_c=getPacManCol();
+			if(grid[pacman_r+1][pacman_c]==EMPTY || grid[pacman_r+1][pacman_c]==PELLET || grid[pacman_r+1][pacman_c]==MUSHROOM){
+			if(grid[pacman_r+1][pacman_c]==PELLET)score++;
+			if(grid[pacman_r+1][pacman_c]==MUSHROOM)score+=10;
+			grid[pacman_r+1][pacman_c]=MARIO;
+			grid[pacman_r][pacman_c]=EMPTY;
+		}
+		else if(grid[pacman_r+1][pacman_c]==GOOMBA){
+			death();
+		}
+		}
+			else if (value==37){
+			direction = LEFT;
+			int pacman_r=getPacManRow();
+			int pacman_c=getPacManCol();
+			if(pacman_c==0) pacman_c = 16;
+			if(grid[pacman_r][pacman_c-1]==EMPTY || grid[pacman_r][pacman_c-1]==PELLET || grid[pacman_r][pacman_c-1]==MUSHROOM){
+			if(grid[pacman_r][pacman_c-1]==PELLET)score++;
+			if(grid[pacman_r][pacman_c-1]==MUSHROOM)score+=10;
+			grid[pacman_r][pacman_c-1]=MARIO;
+			if(pacman_c == 16 ) pacman_c = 0;
+			grid[pacman_r][pacman_c]=EMPTY;
+		}
+		else if(grid[pacman_r][pacman_c-1]==GOOMBA){
+		death();
+		}
+		}
+		else if (value==39){
+			direction =RIGHT;
+			int pacman_r=getPacManRow();
+			int pacman_c=getPacManCol();
+			if(pacman_c==15) pacman_c = -1;
+			if(grid[pacman_r][pacman_c+1]==EMPTY  || grid[pacman_r][pacman_c+1]==PELLET || grid[pacman_r][pacman_c+1]==MUSHROOM){
+			if(grid[pacman_r][pacman_c+1]==PELLET)score++;
+			if(grid[pacman_r][pacman_c+1]==MUSHROOM)score+=10;
+			grid[pacman_r][pacman_c+1]=MARIO;
+			if(pacman_c == -1) pacman_c = 15;
+			grid[pacman_r][pacman_c]=EMPTY;
+		}
+		else if(grid[pacman_r][pacman_c+1]==GOOMBA){
+			death();
+		}
+		}	
+		System.out.println("Score: " + score);
+		paintGrid();
+	}
+	
+	public int getPacManRow(){
+
+		for(int i=0;i<32;i++){
+			for(int j=0;j<16;j++){
+				if(grid[i][j]==1)
+					return i;
+			}
+		}
+		return 0;
+	}
+
+	public int getPacManCol(){
+		for(int i=0;i<32;i++){
+			for(int j=0;j<16;j++){
+				if(grid[i][j]==1)
+					return j;
+			}
+		}
+		return 0;
+}
+	public void death() {
+			int pacman_r=getPacManRow();
+			int pacman_c=getPacManCol();
+			life--;
+			SoundEffect.DIE.play();
+			direction = RIGHT;
+			if (life == 0)System.exit(0);
+			grid[pacman_r][pacman_c]=EMPTY;
+			grid[22][8] = MARIO;
+	}
+	
+	public void paintGrid(){
+		score_text.setText(""+score);
+		for(int i=0;i<32;i++){
+				for(int j=0;j<16;j++){
+					if (grid[i][j] == EMPTY){
+						if(life == 2)live3.setIcon(blocks[EMPTY]);
+						else if(life == 1)live2.setIcon(blocks[EMPTY]);
+						}
+						else if(grid[i][j]==MARIO){
+							if (direction == LEFT) pGrid[i][j].setIcon(pacmans[LEFT]);
+							else if (direction == UP || grid[i][j]==MARIO) pGrid[i][j].setIcon(pacmans[UP]);
+							else if (direction == RIGHT || grid[i][j]==MARIO) pGrid[i][j].setIcon(pacmans[RIGHT]);
+							else if (direction == DOWN) pGrid[i][j].setIcon(pacmans[DOWN]);
+						}
+					
+						pGrid[i][j].setIcon(blocks[grid[i][j]]);
+				}
+			}
+
+						window.repaint();
+
+
+	}
+	public void keyReleased(KeyEvent e){
+	}
+JPanel top = new JPanel();
+JPanel body = new JPanel();
+JLabel score_text=new JLabel("000");
+JLabel score_lbl=new JLabel("SCORE:");
+JLabel live1 = new JLabel(pacmans[1]);
+JLabel live2 = new JLabel(pacmans[1]);
+JLabel live3 = new JLabel(pacmans[1]);
+public PacMan(){
+	
+	SoundEffect.init();
+    SoundEffect.volume = SoundEffect.Volume.LOW;
+	top.add(score_lbl);
+	top.add(score_text);
+	top.add(live1);
+	top.add(live2);
+	top.add(live3);
+	window= new JFrame("MarioMan");
+	window.addKeyListener(this);
+	top.setLayout(new GridLayout(1,5));
+	body.setLayout(new GridLayout(32,16));
+	JPanel splashScreen=new JPanel();
+	JLabel splashScreenImage=new JLabel(new ImageIcon());
+	splashScreen.add(splashScreenImage);
+	window.getContentPane().add(splashScreen);
+	window.setVisible(true);
+	window.setSize(512, 1024);
+	try{
+		Thread.sleep(500);
+		window.getContentPane().remove(splashScreen);
+	}
+	catch(Exception e){
+		System.out.println();
+	}
+	window.setLayout(new BorderLayout());
+	block = new JLabel(empty);
+	pGrid=new JLabel[32][16];
+	for(int i=0; i<32; i++){
+		for(int j=0; j<16; j++){
+			pGrid[i][j]= new JLabel(blocks[grid[i][j]]);
+			body.add(pGrid[i][j]);
+		}
+	}
+	window.add(body, BorderLayout.CENTER);
+	window.add(top, BorderLayout.NORTH);
+	window.pack();
+	window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	window.setVisible(true);
+	time = new Timer(500, this);
+	time.start();
+	time.setRepeats(true);
+};
+
+public static void main(String[] args) {
+	new PacMan();
+}
+}
